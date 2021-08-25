@@ -14,8 +14,21 @@ func main() {
 		"/yaml-godoc":     "https://godoc.org/gopkg.in/yaml.v2",
 	}
 	mapHandler := handler.MapHandler(pathsToUrls, mux)
+
+	yaml := `
+- path: /urlshort
+  url: https://godoc.org/github.com/gophercises/urlshort
+- path: /yaml-godoc
+  url: https://godoc.org/gopkg.in/yaml.v2 
+`
+
+	yamlHandler, err := handler.YAMLHandler([]byte(yaml), mapHandler)
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Println("Starting the server on :8000")
-	http.ListenAndServe(":8000", mapHandler)
+	http.ListenAndServe(":8000", yamlHandler)
 }
 
 func defaultMux() *http.ServeMux {
