@@ -1,13 +1,17 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"urlshort/handler"
 )
 
 func main() {
 	mux := defaultMux()
+	fptr := flag.String("fpath", "example.yaml", "file path to read yaml from")
+	flag.Parse()
 
 	pathsToUrls := map[string]string{
 		"/urlshort-godoc": "https://godoc.org/github.com/gophercises/urlshort",
@@ -15,12 +19,10 @@ func main() {
 	}
 	mapHandler := handler.MapHandler(pathsToUrls, mux)
 
-	yaml := `
-- path: /urlshort
-  url: https://godoc.org/github.com/gophercises/urlshort
-- path: /yaml-godoc
-  url: https://godoc.org/gopkg.in/yaml.v2 
-`
+	yaml, err := ioutil.ReadFile(*fptr)
+	if err != nil {
+		panic(err)
+	}
 
 	yamlHandler, err := handler.YAMLHandler([]byte(yaml), mapHandler)
 	if err != nil {
